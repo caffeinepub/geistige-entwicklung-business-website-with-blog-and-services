@@ -1,0 +1,64 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Daily visitors tracking + Admin Analytics bar chart (frontend)",
+  "requirements": [
+    {
+      "id": "REQ-5",
+      "summary": "Track a unique daily visitor at most once per browser per local calendar day on the public homepage, with safe localStorage fallback and no admin counting.",
+      "acceptanceCriteria": [
+        "Reloading the homepage multiple times on the same day increments the backend daily visitors bucket at most once per browser.",
+        "Visiting again on a new day increments the new day bucket once.",
+        "The tracking implementation does not create runtime errors if localStorage is unavailable (falls back safely)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/utils/dailyVisitorTracking.ts",
+          "operation": "create",
+          "description": "Add small utilities for daily visitor tracking: compute local YYYY-MM-DD, safely read/write localStorage with try/catch, and generate/persist a stable per-browser visitor session id used when calling the backend tracking mutation."
+        },
+        {
+          "path": "frontend/src/pages/HomePage.tsx",
+          "operation": "modify",
+          "description": "Wire daily visitor tracking to run on homepage load: if the user is not an admin and the stored tracked date differs from today, call the unique-visitor tracking mutation once and persist today's date; ensure all storage operations are guarded so the page never throws when localStorage is unavailable."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Add a daily visitors (last days) bar chart section to the Admin Analytics dashboard with a robust empty state.",
+      "acceptanceCriteria": [
+        "Admin analytics page shows a new bar chart section for daily visitors (last days).",
+        "Chart labels are human-readable dates (e.g., YYYY-MM-DD) derived from the backend bucket key.",
+        "If dailyVisitors is empty or missing data, the UI shows a non-crashing empty state message instead of rendering errors."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/admin/AnalyticsManagement.tsx",
+          "operation": "modify",
+          "description": "Extend the admin analytics UI to render a Daily Visitors bar chart from the analytics dailyVisitors series (render independently of other series), including safe runtime handling when dailyVisitors is missing/undefined and an English empty-state message when no daily data exists."
+        }
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "summary": "Update frontend query hooks and TypeScript data mapping to fetch and consume the new dailyVisitors analytics field without TS errors.",
+      "acceptanceCriteria": [
+        "TypeScript build succeeds with no type errors related to AnalyticsData.",
+        "useGetAnalyticsData() returns data that includes the new dailyVisitors field and AnalyticsManagement consumes it safely."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add a dedicated React Query mutation hook for the backend unique visitor tracking call (trackUniqueVisitor) and ensure analytics querying/typing remains compatible with the updated AnalyticsData shape that includes dailyVisitors."
+        },
+        {
+          "path": "frontend/src/components/admin/AnalyticsManagement.tsx",
+          "operation": "modify",
+          "description": "Adjust analytics data mapping for dailyVisitors to avoid runtime crashes from unexpected backend shapes (e.g., missing field) while keeping TypeScript build clean; include conversion from bucket keys to human-readable YYYY-MM-DD labels."
+        }
+      ]
+    }
+  ]
+}
