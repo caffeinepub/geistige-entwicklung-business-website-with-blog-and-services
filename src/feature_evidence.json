@@ -2,53 +2,8 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-a-robust-frontend-tracking-call-so-the-backend-daily-visitors-counter-is-incremented-at-most-once-per-browser-per-calendar-day-store-a-local-marker-e-g-localstorage-keyed-by-the-computed-local-date-yyyy-mm-dd-and-only-trigger-the-daily-visitor-tracking-mutation-when-the-stored-date-differs-from-today-ensure-this-tracking-runs-on-the-public-site-e-g-on-homepage-load-and-continues-to-respect-the-existing-visitor-only-rule-admin-activity-must-not-be-counted",
-      "featureTitle": "Add a robust frontend tracking call so the backend daily visitors counter is incremented at most once per browser per calendar day. Store a local marker (e.g., localStorage) keyed by the computed local date (YYYY-MM-DD) and only trigger the daily-visitor tracking mutation when the stored date differs from today. Ensure this tracking runs on the public site (e.g., on homepage load) and continues to respect the existing visitor-only rule (admin activity must not be counted).",
-      "files": [
-        "frontend/src/pages/HomePage.tsx",
-        "frontend/src/utils/dailyVisitorTracking.ts"
-      ],
-      "components": [
-        "blob-storage@4.0.0",
-        "stripe@3.0.0",
-        "http-outcalls@3.0.0",
-        "authorization@3.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-5"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-the-admin-analytics-dashboard-ui-frontend-src-components-admin-analyticsmanagement-tsx-to-display-a-daily-visitors-bar-chart-for-the-last-days-using-the-new-daily-visitors-series-returned-by-the-backend-the-chart-must-render-even-when-other-analytics-series-are-empty-and-must-show-a-clear-empty-state-when-no-daily-data-exists-yet",
-      "featureTitle": "Update the Admin Analytics dashboard UI (frontend/src/components/admin/AnalyticsManagement.tsx) to display a daily visitors bar chart for the last days using the new daily visitors series returned by the backend. The chart must render even when other analytics series are empty, and must show a clear empty state when no daily data exists yet.",
-      "files": [
-        "frontend/src/components/admin/AnalyticsManagement.tsx"
-      ],
-      "components": [
-        "blob-storage@4.0.0",
-        "stripe@3.0.0",
-        "http-outcalls@3.0.0",
-        "authorization@3.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-6"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-frontend-query-typing-and-data-mapping-so-the-new-daily-visitors-field-is-fetched-and-consumed-without-typescript-errors-this-includes-updating-the-analyticsdata-type-usage-in-frontend-src-hooks-usequeries-ts-and-any-generated-backend-typings-usage-and-ensuring-the-admin-analytics-ui-compiles-and-runs-with-the-updated-analyticsdata-shape",
-      "featureTitle": "Update frontend query typing and data mapping so the new daily visitors field is fetched and consumed without TypeScript errors. This includes updating the AnalyticsData type usage in frontend/src/hooks/useQueries.ts (and any generated backend typings usage) and ensuring the admin analytics UI compiles and runs with the updated AnalyticsData shape.",
+      "featureId": "feature-add-a-reload-button-to-the-analyticsmanagement-component-that-refetches-all-analytics-data-from-the-backend-when-clicked",
+      "featureTitle": "Add a reload button to the AnalyticsManagement component that refetches all analytics data from the backend when clicked",
       "files": [
         "frontend/src/components/admin/AnalyticsManagement.tsx",
         "frontend/src/hooks/useQueries.ts"
@@ -65,7 +20,52 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-7"
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-reset-button-to-the-analyticsmanagement-component-that-clears-all-analytics-data-in-the-backend-and-refreshes-the-display",
+      "featureTitle": "Add a reset button to the AnalyticsManagement component that clears all analytics data in the backend and refreshes the display",
+      "files": [
+        "frontend/src/components/admin/AnalyticsManagement.tsx",
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "blob-storage@4.0.0",
+        "stripe@3.0.0",
+        "http-outcalls@3.0.0",
+        "authorization@3.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-review-and-simplify-the-analyticsmanagement-component-code-to-improve-reliability-and-maintainability",
+      "featureTitle": "Review and simplify the AnalyticsManagement component code to improve reliability and maintainability",
+      "files": [
+        "frontend/src/components/admin/AnalyticsManagement.tsx"
+      ],
+      "components": [
+        "blob-storage@4.0.0",
+        "stripe@3.0.0",
+        "http-outcalls@3.0.0",
+        "authorization@3.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
       ],
       "confidence": "high"
     }

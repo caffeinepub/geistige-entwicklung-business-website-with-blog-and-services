@@ -1,93 +1,77 @@
 {
   "kind": "build_request",
-  "title": "Add daily visitors bar chart to Admin Analytics (visitor-only, last days)",
+  "title": "Add reset and reload buttons to analytics panel",
+  "projectName": "Admin CMS Dashboard",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-4",
-      "text": "Extend the backend analytics model to track a daily visitors time series and return it from the admin analytics API. Add a new field to AnalyticsData (e.g., dailyVisitors) that returns a list of (dayKey, count) buckets for the most recent days. The dayKey must be a stable calendar-day bucket derived from canister time (e.g., days-since-epoch as text, or a YYYY-MM-DD-like key), and tracking must exclude admin activity exactly like existing trackPageVisit/trackElementClick/trackSectionView do.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-10"
-        ],
-        "quotes": [
-          "unter analytics sollen auch tägliche besucher angezeigt werden. ein balkendiagram der einzelnen besucher der letzen tage."
-        ]
-      },
-      "acceptanceCriteria": [
-        "backend/main.mo AnalyticsData includes a new daily visitors series field without breaking existing analytics fields (pageVisits, elementClicks, sectionViews).",
-        "A visitor-only tracking path increments the correct bucket for the current day and does not increment when the caller is an admin.",
-        "getAnalyticsData() returns the daily visitors series for admins without trapping for authorized admins."
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "text": "Add a robust frontend tracking call so the backend daily visitors counter is incremented at most once per browser per calendar day. Store a local marker (e.g., localStorage) keyed by the computed local date (YYYY-MM-DD) and only trigger the daily-visitor tracking mutation when the stored date differs from today. Ensure this tracking runs on the public site (e.g., on homepage load) and continues to respect the existing visitor-only rule (admin activity must not be counted).",
+      "id": "REQ-1",
+      "text": "Add a reload button to the AnalyticsManagement component that refetches all analytics data from the backend when clicked",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-10",
-          "msg-12"
+          "msg-final"
         ],
         "quotes": [
-          "unter analytics sollen auch tägliche besucher angezeigt werden. ein balkendiagram der einzelnen besucher der letzen tage.",
-          "it failed the last promt 2 times. can you change it so it will definitely work?"
+          "implement a reset and reload button on the analytics panel in admin dashboard"
         ]
       },
       "acceptanceCriteria": [
-        "Reloading the homepage multiple times on the same day increments the backend daily visitors bucket at most once per browser.",
-        "Visiting again on a new day increments the new day bucket once.",
-        "The tracking implementation does not create runtime errors if localStorage is unavailable (falls back safely)."
+        "Reload button is visible in the analytics panel header",
+        "Clicking reload button triggers a refetch of analytics data",
+        "Loading state is shown during reload operation",
+        "Success feedback is provided after reload completes"
       ]
     },
     {
-      "id": "REQ-6",
-      "text": "Update the Admin Analytics dashboard UI (frontend/src/components/admin/AnalyticsManagement.tsx) to display a daily visitors bar chart for the last days using the new daily visitors series returned by the backend. The chart must render even when other analytics series are empty, and must show a clear empty state when no daily data exists yet.",
-      "target": "frontend",
+      "id": "REQ-2",
+      "text": "Add a reset button to the AnalyticsManagement component that clears all analytics data in the backend and refreshes the display",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-10",
-          "msg-12"
+          "msg-final"
         ],
         "quotes": [
-          "unter analytics sollen auch tägliche besucher angezeigt werden. ein balkendiagram der einzelnen besucher der letzen tage.",
-          "it failed the last promt 2 times. can you change it so it will definitely work?"
+          "implement a reset and reload button on the analytics panel in admin dashboard"
         ]
       },
       "acceptanceCriteria": [
-        "Admin analytics page shows a new bar chart section for daily visitors (last days).",
-        "Chart labels are human-readable dates (e.g., YYYY-MM-DD) derived from the backend bucket key.",
-        "If dailyVisitors is empty or missing data, the UI shows a non-crashing empty state message instead of rendering errors."
+        "Reset button is visible in the analytics panel header",
+        "Clicking reset shows a confirmation dialog before proceeding",
+        "Reset action calls backend method to clear analytics data",
+        "Frontend display updates to show cleared state after successful reset",
+        "Error handling is implemented if reset fails"
       ]
     },
     {
-      "id": "REQ-7",
-      "text": "Update frontend query typing and data mapping so the new daily visitors field is fetched and consumed without TypeScript errors. This includes updating the AnalyticsData type usage in frontend/src/hooks/useQueries.ts (and any generated backend typings usage) and ensuring the admin analytics UI compiles and runs with the updated AnalyticsData shape.",
+      "id": "REQ-3",
+      "text": "Review and simplify the AnalyticsManagement component code to improve reliability and maintainability",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-10"
+          "msg-final"
         ],
         "quotes": [
-          "Extend the backend analytics model to track daily visitor counts and expose them to the admin analytics API."
+          "clean up your code, if it is nesessary"
         ]
       },
       "acceptanceCriteria": [
-        "TypeScript build succeeds with no type errors related to AnalyticsData.",
-        "useGetAnalyticsData() returns data that includes the new dailyVisitors field and AnalyticsManagement consumes it safely."
+        "Remove any redundant or duplicate code in AnalyticsManagement.tsx",
+        "Ensure consistent error handling patterns across all analytics operations",
+        "Simplify complex conditional logic where possible",
+        "Verify all data fetching operations have proper loading and error states"
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single-actor Motoko canister; put all backend logic in backend/main.mo.",
-    "Do not edit files under frontend/src/components/ui or any frontend immutablePaths listed in SYSTEM_CONTEXT.",
-    "Use English for any new user-facing text added by this change."
+    "Preserve existing analytics data structure and tracking functionality",
+    "Maintain compatibility with current analytics backend methods",
+    "Do not modify the analytics data model in backend/main.mo unless necessary for reset functionality"
   ],
   "nonGoals": [
-    "Do not implement real-time analytics updates or streaming.",
-    "Do not redesign the entire analytics dashboard beyond adding the requested daily visitors chart.",
-    "Do not change existing analytics counting semantics for pageVisits/elementClicks/sectionViews except what is necessary to add daily visitors."
+    "Redesigning the entire analytics dashboard layout",
+    "Adding new analytics metrics beyond reset and reload functionality",
+    "Modifying other admin dashboard tabs or components"
   ],
   "imageRequirements": {
     "required": [],

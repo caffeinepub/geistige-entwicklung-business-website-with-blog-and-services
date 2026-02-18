@@ -1,62 +1,67 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Daily visitors tracking + Admin Analytics bar chart (frontend)",
+  "title": "Add reset and reload buttons to analytics panel",
   "requirements": [
     {
-      "id": "REQ-5",
-      "summary": "Track a unique daily visitor at most once per browser per local calendar day on the public homepage, with safe localStorage fallback and no admin counting.",
+      "id": "REQ-1",
+      "summary": "Add a reload button to the AnalyticsManagement component that refetches all analytics data from the backend when clicked",
       "acceptanceCriteria": [
-        "Reloading the homepage multiple times on the same day increments the backend daily visitors bucket at most once per browser.",
-        "Visiting again on a new day increments the new day bucket once.",
-        "The tracking implementation does not create runtime errors if localStorage is unavailable (falls back safely)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/utils/dailyVisitorTracking.ts",
-          "operation": "create",
-          "description": "Add small utilities for daily visitor tracking: compute local YYYY-MM-DD, safely read/write localStorage with try/catch, and generate/persist a stable per-browser visitor session id used when calling the backend tracking mutation."
-        },
-        {
-          "path": "frontend/src/pages/HomePage.tsx",
-          "operation": "modify",
-          "description": "Wire daily visitor tracking to run on homepage load: if the user is not an admin and the stored tracked date differs from today, call the unique-visitor tracking mutation once and persist today's date; ensure all storage operations are guarded so the page never throws when localStorage is unavailable."
-        }
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "summary": "Add a daily visitors (last days) bar chart section to the Admin Analytics dashboard with a robust empty state.",
-      "acceptanceCriteria": [
-        "Admin analytics page shows a new bar chart section for daily visitors (last days).",
-        "Chart labels are human-readable dates (e.g., YYYY-MM-DD) derived from the backend bucket key.",
-        "If dailyVisitors is empty or missing data, the UI shows a non-crashing empty state message instead of rendering errors."
+        "Reload button is visible in the analytics panel header",
+        "Clicking reload button triggers a refetch of analytics data",
+        "Loading state is shown during reload operation",
+        "Success feedback is provided after reload completes"
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/admin/AnalyticsManagement.tsx",
           "operation": "modify",
-          "description": "Extend the admin analytics UI to render a Daily Visitors bar chart from the analytics dailyVisitors series (render independently of other series), including safe runtime handling when dailyVisitors is missing/undefined and an English empty-state message when no daily data exists."
-        }
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "summary": "Update frontend query hooks and TypeScript data mapping to fetch and consume the new dailyVisitors analytics field without TS errors.",
-      "acceptanceCriteria": [
-        "TypeScript build succeeds with no type errors related to AnalyticsData.",
-        "useGetAnalyticsData() returns data that includes the new dailyVisitors field and AnalyticsManagement consumes it safely."
-      ],
-      "file_operations": [
+          "description": "Add a reload button to the component header that calls the refetch function from the useGetAnalyticsData hook. Display a loading spinner icon during refetch operation. Show a success toast notification after reload completes using toast from sonner. Position the reload button in the header alongside existing analytics title."
+        },
         {
           "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Add a dedicated React Query mutation hook for the backend unique visitor tracking call (trackUniqueVisitor) and ensure analytics querying/typing remains compatible with the updated AnalyticsData shape that includes dailyVisitors."
-        },
+          "description": "Ensure the useGetAnalyticsData hook returns the refetch function and isRefetching state from useQuery to support manual data reloading. Verify the query configuration allows manual refetching."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Add a reset button to the AnalyticsManagement component that clears all analytics data in the backend and refreshes the display",
+      "acceptanceCriteria": [
+        "Reset button is visible in the analytics panel header",
+        "Clicking reset shows a confirmation dialog before proceeding",
+        "Reset action calls backend method to clear analytics data",
+        "Frontend display updates to show cleared state after successful reset",
+        "Error handling is implemented if reset fails"
+      ],
+      "file_operations": [
         {
           "path": "frontend/src/components/admin/AnalyticsManagement.tsx",
           "operation": "modify",
-          "description": "Adjust analytics data mapping for dailyVisitors to avoid runtime crashes from unexpected backend shapes (e.g., missing field) while keeping TypeScript build clean; include conversion from bucket keys to human-readable YYYY-MM-DD labels."
+          "description": "Add a reset button to the component header that opens a confirmation dialog using AlertDialog from shadcn/ui before clearing analytics. Implement the reset flow using useMutation to call actor.clearAnalyticsData(), followed by invalidating the analytics query to refresh the display. Show loading state during reset operation. Display success toast on completion and error toast on failure. Position the reset button in the header next to the reload button with appropriate destructive styling."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add a new useClearAnalyticsData mutation hook that wraps actor.clearAnalyticsData(). Configure the mutation to invalidate the analytics query key on success to trigger automatic refetch of cleared data. Include proper error handling and return mutation states for UI feedback."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Review and simplify the AnalyticsManagement component code to improve reliability and maintainability",
+      "acceptanceCriteria": [
+        "Remove any redundant or duplicate code in AnalyticsManagement.tsx",
+        "Ensure consistent error handling patterns across all analytics operations",
+        "Simplify complex conditional logic where possible",
+        "Verify all data fetching operations have proper loading and error states"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/admin/AnalyticsManagement.tsx",
+          "operation": "modify",
+          "description": "Review and refactor the component to remove any redundant code, consolidate repeated logic into helper functions if needed, and ensure consistent error handling using try-catch blocks with toast notifications. Simplify conditional rendering logic for loading and error states. Verify that all chart components and data transformations handle edge cases properly (empty arrays, null values). Ensure the component follows React best practices with proper dependency arrays in useEffect hooks if any exist."
         }
       ]
     }

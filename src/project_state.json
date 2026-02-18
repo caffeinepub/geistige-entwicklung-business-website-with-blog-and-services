@@ -1,334 +1,34 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 5,
-  "summary": "ICP-based business website/CMS with a public homepage (German UI) and an admin dashboard. The site supports blog posts with Markdown-style image embeds, a product/store catalog (eBooks/clothing/other) with cover + preview images, 1-on-1 meeting slot booking with appointments, a configurable livestream schedule, external link buttons, and a playlist-based MP3 player with visitor-only play count tracking. Admins authenticate via Internet Identity, manage all content with immediate “live persistence” (auto-save after ~2s inactivity, no draft mode), configure homepage sections (order/visibility/custom sections), and view visitor-only analytics (page visits, section views, element clicks) rendered as charts. Backend is a Motoko canister using Map-based in-memory state, role-based access control, blob storage integration via Caffeine ExternalBlob, and Stripe checkout session/status via HTTPS outcalls.",
+  "projectStateVersion": 3,
+  "summary": "Admin dashboard application with analytics panel requiring reset and reload functionality",
+  "architectural_notes": [],
+  "known_issues": [
+    "Build failures occurring on user requests - code cleanup may be needed"
+  ],
+  "isFixRequest": true,
   "existing_features": [
     {
-      "id": "IF-1",
-      "title": "Dynamic homepage section rendering",
-      "synonyms": [
-        "HomepageSections",
-        "Configurable homepage",
-        "Section-based layout"
-      ],
-      "description": "Homepage renders an ordered list of sections provided by the backend (blog, store items, meetings, MP3 player, livestream, links, and custom sections). Visibility is filtered for non-admin visitors, while admins can see hidden sections.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-2",
-      "title": "Admin homepage section management",
-      "synonyms": [
-        "Page management",
-        "Seitenverwaltung"
-      ],
-      "description": "Admin UI to add/delete homepage sections, choose a predefined section type or custom section, reorder sections (up/down), and toggle section visibility. Changes are persisted live in the canister.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-3",
-      "title": "Custom homepage sections with inline editing",
-      "synonyms": [
-        "Custom sections",
-        "EditableCustomSection"
-      ],
-      "description": "Supports custom sections on the homepage with editable title and description. Admins can edit inline with save/cancel; visitors see read-only content.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-4",
-      "title": "Global site content configuration and inline editing",
-      "synonyms": [
-        "SiteContent",
-        "EditableSection",
-        "Business title editing",
-        "Footer editing"
-      ],
-      "description": "Backend stores SiteContent (business title, per-section titles/descriptions, footer text). Admins can edit business title in the header, section headers via EditableSection, and footer content inline; updates persist live.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-5",
-      "title": "Internet Identity authentication and session handling",
-      "synonyms": [
-        "II login",
-        "AuthClient",
-        "DelegationIdentity"
-      ],
-      "description": "Frontend integrates Internet Identity for login/logout and persists identity across reloads. Anonymous users get an anonymous actor; authenticated users get an identity-backed actor.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-6",
-      "title": "Role-based access control (admin/user/guest)",
-      "synonyms": [
-        "Authorization",
-        "Permissions"
-      ],
-      "description": "Motoko access control assigns roles and enforces permissions: admins can manage content and analytics; users can book appointments and use Stripe; guests can browse public content. First principal to initialize becomes admin.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-7",
-      "title": "User profile creation and retrieval",
-      "synonyms": [
-        "ProfileSetupModal",
-        "UserProfile"
-      ],
-      "description": "Authenticated users are prompted to set up a basic profile (name/email) if missing. Profiles are stored per principal; header shows profile dropdown and logout.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-8",
-      "title": "Blog: public listing and post modal viewer",
-      "synonyms": [
-        "Blog section",
-        "BlogPostModal"
-      ],
-      "description": "Public blog section lists posts in a grid with German date formatting and excerpt. Clicking opens a modal viewer that renders text paragraphs and Markdown-style embedded images (\"![alt](url)\") while preserving spacing.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-9",
-      "title": "Blog: admin creation and deletion",
-      "synonyms": [
-        "BlogManagement"
-      ],
-      "description": "Admin dashboard provides a form to create blog posts (title, excerpt, content) and delete existing posts with confirmation dialogs.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-10",
-      "title": "Blog: inline editing with auto-save and file association",
-      "synonyms": [
-        "InlineEditBlogPost",
-        "Live editing"
-      ],
-      "description": "Admins can edit blog posts inline with auto-save after ~2 seconds of inactivity. Supports uploading files (images/docs) to associate with a post; image uploads auto-insert Markdown image links into content. Includes post deletion with confirmation.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-11",
-      "title": "Store/catalog: public product listing with previews",
-      "synonyms": [
-        "StoreItemSection",
-        "eBooks section"
-      ],
-      "description": "Public store section displays products with cover images, descriptions, EUR pricing, and product type labels. If preview images exist, a modal shows preview image gallery. Clicks are tracked for analytics.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-12",
-      "title": "Store/catalog: admin product creation",
-      "synonyms": [
-        "StoreItemManagement"
-      ],
-      "description": "Admin can add products with title, description, price, product type (eBook/clothing/other), cover image, and optional preview images. Images are uploaded as ExternalBlob.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-13",
-      "title": "Store/catalog: inline editing (live)",
-      "synonyms": [
-        "InlineEditEBook",
-        "InlineEditStoreItem"
-      ],
-      "description": "Admins can edit existing store items inline with auto-save after inactivity, including availability toggle and pricing updates, with immediate live persistence messaging.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-14",
-      "title": "Meetings: public slot listing and booking modal",
-      "synonyms": [
-        "MeetingSection",
-        "BookingModal"
-      ],
-      "description": "Public meetings section lists available meeting slots with German date/time formatting. Visitors can open a booking modal and book a slot by providing their name (requires user permission). Clicks are tracked.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-15",
-      "title": "Meetings: admin slot and appointment management",
-      "synonyms": [
-        "MeetingManagement"
-      ],
-      "description": "Admins can create meeting slots (date/time/duration/description), view all slots with booked/available status, and list all appointments (customer name + slot time).",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-16",
-      "title": "Meetings: inline slot editing (live)",
-      "synonyms": [
-        "InlineEditMeetingSlot"
-      ],
-      "description": "Admins can edit meeting slot descriptions inline with auto-save after inactivity and live save status indicators.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-17",
-      "title": "Livestreams: public schedule section with highlight",
-      "synonyms": [
-        "LivestreamSection"
-      ],
-      "description": "Public livestream section lists events (newest first from backend), formats date/time in German locale, highlights the newest entry visually, and opens external links in a new tab with click tracking. Visibility is filtered for visitors.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-18",
-      "title": "Livestreams: admin CRUD and visibility controls",
-      "synonyms": [
-        "LivestreamManagement",
-        "InlineEditLivestream"
-      ],
-      "description": "Admins can add/edit/delete livestream events, toggle visibility, and also use an inline editor with auto-save and confirmation-based deletion.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-19",
-      "title": "Links: public external link buttons",
-      "synonyms": [
-        "LinksSection"
-      ],
-      "description": "Public links section shows a grid of external link buttons; opens links in a new tab with noopener/noreferrer and tracks clicks for analytics. Admins can see hidden links.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-20",
-      "title": "Links: admin management (create/edit/delete/reorder/visibility)",
-      "synonyms": [
-        "LinksManagement",
-        "InlineEditLink"
-      ],
-      "description": "Admins can create link buttons with URL validation, toggle visibility, delete with confirmation, and reorder links. Inline editor supports auto-save and manual save for individual links.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-21",
-      "title": "MP3 player: public playlists and playback controls",
-      "synonyms": [
-        "Mp3PlayerSection",
-        "Music player"
-      ],
-      "description": "Public MP3 player supports playlist selection, play/pause, previous/next, seek/progress bar, volume/mute, and loop modes. It loads public/visible playlists and visible tracks per playlist.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-22",
-      "title": "MP3 player: visitor-only play count tracking",
-      "synonyms": [
-        "Play count analytics",
-        "incrementPlayCount"
-      ],
-      "description": "When a non-admin user starts playing a track, the backend increments the track’s playCount. Admin actions are excluded. Admin UI can view play counts per track.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-23",
-      "title": "MP3 admin management (playlists/tracks)",
-      "synonyms": [
-        "Mp3PlayerManagement"
-      ],
-      "description": "Admins can create playlists, upload MP3 tracks (duration read from browser metadata), toggle playlist/track visibility, delete tracks with confirmation, and reorder tracks within a playlist (up/down with persisted ordering). Displays per-track visitor play counts.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-24",
-      "title": "Visitor analytics collection and admin dashboard",
-      "synonyms": [
-        "AnalyticsManagement",
-        "trackPageVisit",
-        "trackElementClick",
-        "trackSectionView"
-      ],
-      "description": "Backend tracks visitor-only page visits, element clicks, and section views. Admin dashboard shows totals and charts (bar/pie) and notes that admin activity is excluded.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-25",
-      "title": "Admin dashboard with tabbed management UI",
-      "synonyms": [
-        "AdminDashboard"
-      ],
-      "description": "Admin-only dashboard with tabs for blog, store, meetings, MP3, livestreams, links, pages, and analytics. Enforces authentication and admin role before rendering.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-26",
-      "title": "Quick edit overlay for admins",
-      "synonyms": [
-        "Schnellbearbeitung"
-      ],
-      "description": "Admin overlay with search + tabs to quickly find and inline-edit blog posts, store items, meeting slots, livestreams, and links without navigating individual management pages.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-27",
-      "title": "Stripe checkout session integration (backend)",
-      "synonyms": [
-        "Stripe payments",
-        "Checkout sessions"
-      ],
-      "description": "Motoko backend can be configured with Stripe secret key + allowed countries, create checkout sessions for shopping items, and poll session status via HTTPS outcalls with a transform function.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-28",
-      "title": "Blob storage integration and maintenance endpoints",
-      "synonyms": [
-        "ExternalBlob storage",
-        "Caffeine storage mixin"
-      ],
-      "description": "Backend includes a blob storage mixin providing certificate creation, authorized gateway principal updates, dead blob listing and pruning confirmation, and a cashier refill mechanism for cycle management.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-robust-frontend-tracking-call-so-the-backend-daily-visitors-counter-is-incremented-at-most-once-per-browser-per-calendar-day-store-a-local-marker-e-g-localstorage-keyed-by-the-computed-local-date-yyyy-mm-dd-and-only-trigger-the-daily-visitor-tracking-mutation-when-the-stored-date-differs-from-today-ensure-this-tracking-runs-on-the-public-site-e-g-on-homepage-load-and-continues-to-respect-the-existing-visitor-only-rule-admin-activity-must-not-be-counted",
-      "title": "Add a robust frontend tracking call so the backend daily visitors counter is incremented at most once per browser per calendar day. Store a local marker (e.g., localStorage) keyed by the computed local date (YYYY-MM-DD) and only trigger the daily-visitor tracking mutation when the stored date differs from today. Ensure this tracking runs on the public site (e.g., on homepage load) and continues to respect the existing visitor-only rule (admin activity must not be counted).",
+      "id": "feature-add-a-reload-button-to-the-analyticsmanagement-component-that-refetches-all-analytics-data-from-the-backend-when-clicked",
+      "title": "Add a reload button to the AnalyticsManagement component that refetches all analytics data from the backend when clicked",
       "reqIds": [
-        "REQ-5"
+        "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-update-the-admin-analytics-dashboard-ui-frontend-src-components-admin-analyticsmanagement-tsx-to-display-a-daily-visitors-bar-chart-for-the-last-days-using-the-new-daily-visitors-series-returned-by-the-backend-the-chart-must-render-even-when-other-analytics-series-are-empty-and-must-show-a-clear-empty-state-when-no-daily-data-exists-yet",
-      "title": "Update the Admin Analytics dashboard UI (frontend/src/components/admin/AnalyticsManagement.tsx) to display a daily visitors bar chart for the last days using the new daily visitors series returned by the backend. The chart must render even when other analytics series are empty, and must show a clear empty state when no daily data exists yet.",
+      "id": "feature-add-a-reset-button-to-the-analyticsmanagement-component-that-clears-all-analytics-data-in-the-backend-and-refreshes-the-display",
+      "title": "Add a reset button to the AnalyticsManagement component that clears all analytics data in the backend and refreshes the display",
       "reqIds": [
-        "REQ-6"
+        "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-update-frontend-query-typing-and-data-mapping-so-the-new-daily-visitors-field-is-fetched-and-consumed-without-typescript-errors-this-includes-updating-the-analyticsdata-type-usage-in-frontend-src-hooks-usequeries-ts-and-any-generated-backend-typings-usage-and-ensuring-the-admin-analytics-ui-compiles-and-runs-with-the-updated-analyticsdata-shape",
-      "title": "Update frontend query typing and data mapping so the new daily visitors field is fetched and consumed without TypeScript errors. This includes updating the AnalyticsData type usage in frontend/src/hooks/useQueries.ts (and any generated backend typings usage) and ensuring the admin analytics UI compiles and runs with the updated AnalyticsData shape.",
+      "id": "feature-review-and-simplify-the-analyticsmanagement-component-code-to-improve-reliability-and-maintainability",
+      "title": "Review and simplify the AnalyticsManagement component code to improve reliability and maintainability",
       "reqIds": [
-        "REQ-7"
+        "REQ-3"
       ],
       "version": 1
     }
@@ -336,70 +36,18 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Analytics erweitern: tägliche Besucher (Visitors pro Tag der letzten Tage) als Balkendiagramm im Admin-Analytics-Bereich anzeigen",
+      "summary": "Add reset button to analytics panel in admin dashboard",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Extend the backend analytics model to track daily visitor counts and expose them to the admin analytics API. Bucket counts by calendar day (e.g., YYYY-MM-DD) using canister time and exclude admin activity the same way current analytics tracking does.",
-      "reqIds": [
-        "REQ-1"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Update the Admin Analytics dashboard UI (frontend/src/components/admin/AnalyticsManagement.tsx) to display a bar chart for daily visitors over the last days, using the daily series returned by the backend analytics API.",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "Update the frontend analytics query typing and data mapping (frontend/src/hooks/useQueries.ts and generated backend typings usage) so the new daily visitors field is fetched and consumed by the admin analytics UI without TypeScript errors.",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-5",
-      "summary": "Extend the backend analytics model to track a daily visitors time series and return it from the admin analytics API. Add a new field to AnalyticsData (e.g., dailyVisitors) that returns a list of (dayKey, count) buckets for the most recent days. The dayKey must be a stable calendar-day bucket derived from canister time (e.g., days-since-epoch as text, or a YYYY-MM-DD-like key), and tracking must exclude admin activity exactly like existing trackPageVisit/trackElementClick/trackSectionView do.",
-      "reqIds": [
-        "REQ-4"
-      ],
+      "summary": "Add reload button to analytics panel in admin dashboard",
+      "reqIds": [],
       "status": "pending"
     }
   ],
-  "architectural_notes": [
-    "Frontend is React + TypeScript using TanStack Router for routing and TanStack React Query for data fetching/caching/mutations.",
-    "Backend is a single Motoko canister (actor) with Map-based state for content entities (blog/store/meetings/livestreams/links/mp3/playlists) and query/shared methods.",
-    "Identity/auth uses Internet Identity (AuthClient) with DelegationIdentity; frontend creates an authenticated/anonymous canister actor depending on identity.",
-    "Role-based access control implemented in Motoko (admin/user/guest); first non-anonymous initializer becomes admin; permissions enforced on all write/admin endpoints.",
-    "“Live persistence” UX pattern: many inline editors auto-save changes after 2 seconds of inactivity; changes are immediately reflected to all visitors (no draft workflow).",
-    "File/media handling uses Caffeine ExternalBlob; frontend obtains direct URLs for display; backend stores blobs directly inside entities (cover images, preview images, mp3 files, blog associated files).",
-    "Homepage composition is data-driven: backend stores ordered HomepageSection objects with sectionType variants; frontend renders sections dynamically and supports custom sections.",
-    "Visitor-only analytics: backend tracking methods early-return for admins; admin dashboard visualizes BigInt/Nat counts using recharts.",
-    "Stripe integration is implemented in Motoko via HTTPS outcalls with a transform function; supports creating checkout sessions and polling session status.",
-    "TailwindCSS + shadcn/ui style system with OKLCH theme variables and light/dark mode via next-themes."
-  ],
-  "known_issues": [
-    "Frontend double-wraps providers: main.tsx already wraps QueryClientProvider and InternetIdentityProvider, and App.tsx wraps them again (likely creates multiple QueryClients/contexts and inconsistent caching).",
-    "Analytics section view IDs likely mismatched: HomePage tracks section views using section.id (e.g., \"section-...\") while AnalyticsManagement label mapping expects logical IDs (\"blog\",\"storeItems\", etc.), resulting in unclear charts/labels.",
-    "backend.deleteBlogFile is effectively a no-op (filters always true) and does not remove any file; also ignores the provided file path parameter.",
-    "Admin BlogManagement “image upload” only creates ExternalBlob direct URLs locally and does not persist/associate uploaded images with the backend unless added via addBlogFile in InlineEditBlogPost.",
-    "Stripe checkout session body builder sets shipping_address_collection[allowed_countries][0] for every country (index is not incremented), so only one country may be effective.",
-    "Access control bootstrap is risky for production: first non-anonymous caller to initializeAccessControl becomes admin automatically.",
-    "Homepage section view tracking is triggered onMouseEnter and may overcount due to frequent hover events (no throttling/debounce or “once per view” logic).",
-    "Meeting slot IDs are derived from startTime+duration; creating multiple slots with same start time/duration can collide and overwrite.",
-    "Some inline auto-save implementations trigger periodic saves without a strict “hasChanges” guard (e.g., InlineEditLink/InlineEditEBook/InlineEditLivestream), potentially causing unnecessary backend writes.",
-    "Backend stores many entities in memory only (no explicit stable persistence shown in provided code); durability across upgrades depends on the migration/upgrade strategy outside the shown snippets."
-  ],
-  "isFixRequest": true,
-  "gameProjectType": "none",
-  "projectName": "Geistige Entwicklung (Business Website with Blog and Services)",
+  "projectName": "Admin CMS Dashboard",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

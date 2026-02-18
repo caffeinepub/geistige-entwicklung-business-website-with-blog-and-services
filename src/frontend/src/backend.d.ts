@@ -223,6 +223,7 @@ export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     bookAppointment(customerName: string, timeSlotId: string): Promise<string>;
     cancelAppointment(appointmentId: string): Promise<void>;
+    clearAnalyticsData(): Promise<void>;
     createBlogPost(title: string, content: string, excerpt: string): Promise<string>;
     createCheckoutSession(items: Array<ShoppingItem>, successUrl: string, cancelUrl: string): Promise<string>;
     createPlaylist(name: string): Promise<string>;

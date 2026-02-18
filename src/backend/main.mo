@@ -9,12 +9,12 @@ import Time "mo:core/Time";
 import Text "mo:core/Text";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
-import Migration "migration";
+
 import AccessControl "authorization/access-control";
 import MixinStorage "blob-storage/Mixin";
 import Storage "blob-storage/Storage";
 
-(with migration = Migration.run)
+
 actor {
   include MixinStorage();
 
@@ -214,7 +214,7 @@ actor {
 
   let homepageSections = Map.empty<Text, HomepageSection>();
 
-  let analyticsData : AnalyticsDataInternal = {
+  var analyticsData : AnalyticsDataInternal = {
     pageVisits = Map.empty<Text, Nat>();
     elementClicks = Map.empty<Text, Nat>();
     sectionViews = Map.empty<Text, Nat>();
@@ -1090,6 +1090,20 @@ actor {
       elementClicks = analyticsData.elementClicks.toArray();
       sectionViews = analyticsData.sectionViews.toArray();
       dailyVisitors = analyticsData.dailyVisitors.toArray();
+    };
+  };
+
+  public shared ({ caller }) func clearAnalyticsData() : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can clear analytics data");
+    };
+
+    analyticsData := {
+      pageVisits = Map.empty<Text, Nat>();
+      elementClicks = Map.empty<Text, Nat>();
+      sectionViews = Map.empty<Text, Nat>();
+      mp3TrackPlays = Map.empty<Text, Nat>();
+      dailyVisitors = Map.empty<Text, Nat>();
     };
   };
 

@@ -1,9 +1,13 @@
-import { useGetAnalyticsData } from '../../hooks/useQueries';
+import { useGetAnalyticsData, useClearAnalyticsData } from '../../hooks/useQueries';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Loader2, Eye, MousePointer, LayoutGrid, Users } from 'lucide-react';
+import { Loader2, Eye, MousePointer, LayoutGrid, Users, RefreshCw, Trash2 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog';
+import { Button } from '../ui/button';
 import { Info } from 'lucide-react';
+import { toast } from 'sonner';
+import { useState } from 'react';
 
 const COLORS = ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#6366f1', '#14b8a6'];
 
@@ -41,7 +45,30 @@ const dayKeyToDate = (dayKey: string): string => {
 };
 
 export default function AnalyticsManagement() {
-  const { data: analytics, isLoading } = useGetAnalyticsData();
+  const { data: analytics, isLoading, refetch, isRefetching } = useGetAnalyticsData();
+  const clearAnalytics = useClearAnalyticsData();
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
+
+  const handleReload = async () => {
+    try {
+      await refetch();
+      toast.success('Analytics-Daten erfolgreich aktualisiert');
+    } catch (error) {
+      toast.error('Fehler beim Aktualisieren der Analytics-Daten');
+      console.error('Reload error:', error);
+    }
+  };
+
+  const handleReset = async () => {
+    try {
+      await clearAnalytics.mutateAsync();
+      setIsResetDialogOpen(false);
+      toast.success('Analytics-Daten erfolgreich zurückgesetzt');
+    } catch (error) {
+      toast.error('Fehler beim Zurücksetzen der Analytics-Daten');
+      console.error('Reset error:', error);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -110,6 +137,67 @@ export default function AnalyticsManagement() {
 
   return (
     <div className="space-y-6">
+      {/* Header with Action Buttons */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Analytics</h2>
+          <p className="text-muted-foreground">Übersicht über Besucheraktivitäten</p>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            onClick={handleReload}
+            disabled={isRefetching}
+            variant="outline"
+            size="sm"
+          >
+            {isRefetching ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <RefreshCw className="h-4 w-4 mr-2" />
+            )}
+            Aktualisieren
+          </Button>
+          
+          <AlertDialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={clearAnalytics.isPending}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Zurücksetzen
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Analytics-Daten zurücksetzen?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Diese Aktion löscht alle Analytics-Daten unwiderruflich. Alle Besucherstatistiken, Klicks, Seitenaufrufe und täglichen Besucherzahlen werden gelöscht.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleReset}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  disabled={clearAnalytics.isPending}
+                >
+                  {clearAnalytics.isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Wird zurückgesetzt...
+                    </>
+                  ) : (
+                    'Zurücksetzen'
+                  )}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </div>
+
       {/* Info Alert */}
       <Alert>
         <Info className="h-4 w-4" />

@@ -700,12 +700,28 @@ export function useGetAnalyticsData() {
   });
 }
 
+export function useClearAnalyticsData() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.clearAnalyticsData();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['analytics'] });
+    },
+  });
+}
+
+// Analytics Tracking Mutations
 export function useTrackPageVisit() {
   const { actor } = useActor();
 
   return useMutation({
     mutationFn: async (page: string) => {
-      if (!actor) return;
+      if (!actor) throw new Error('Actor not available');
       return actor.trackPageVisit(page);
     },
   });
@@ -716,7 +732,7 @@ export function useTrackElementClick() {
 
   return useMutation({
     mutationFn: async (element: string) => {
-      if (!actor) return;
+      if (!actor) throw new Error('Actor not available');
       return actor.trackElementClick(element);
     },
   });
@@ -727,7 +743,7 @@ export function useTrackSectionView() {
 
   return useMutation({
     mutationFn: async (sectionId: string) => {
-      if (!actor) return;
+      if (!actor) throw new Error('Actor not available');
       return actor.trackSectionView(sectionId);
     },
   });
@@ -735,15 +751,11 @@ export function useTrackSectionView() {
 
 export function useTrackUniqueVisitor() {
   const { actor } = useActor();
-  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (sessionId: string) => {
-      if (!actor) return null;
+      if (!actor) throw new Error('Actor not available');
       return actor.trackUniqueVisitor(sessionId);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['analytics'] });
     },
   });
 }
@@ -759,19 +771,6 @@ export function useGetAllMp3Tracks() {
       return actor.getAllMp3Tracks();
     },
     enabled: !!actor && !isFetching,
-  });
-}
-
-export function useGetMp3TracksByPlaylist(playlistId: string) {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<Mp3Track[]>({
-    queryKey: ['mp3TracksByPlaylist', playlistId],
-    queryFn: async () => {
-      if (!actor) return [];
-      return actor.getMp3TracksByPlaylist(playlistId);
-    },
-    enabled: !!actor && !isFetching && !!playlistId,
   });
 }
 
@@ -801,6 +800,19 @@ export function useGetPublicPlaylists() {
   });
 }
 
+export function useGetMp3TracksByPlaylist(playlistId: string) {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<Mp3Track[]>({
+    queryKey: ['mp3Tracks', playlistId],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getMp3TracksByPlaylist(playlistId);
+    },
+    enabled: !!actor && !isFetching && !!playlistId,
+  });
+}
+
 export function useUploadMp3Track() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
@@ -811,14 +823,14 @@ export function useUploadMp3Track() {
       artist, 
       duration, 
       file, 
-      playlistId,
-      order
+      playlistId, 
+      order 
     }: { 
       title: string; 
       artist: string; 
       duration: bigint; 
       file: ExternalBlob; 
-      playlistId: string;
+      playlistId: string; 
       order: bigint;
     }) => {
       if (!actor) throw new Error('Actor not available');
@@ -826,7 +838,6 @@ export function useUploadMp3Track() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['mp3Tracks'] });
-      queryClient.invalidateQueries({ queryKey: ['mp3TracksByPlaylist'] });
     },
   });
 }
@@ -842,15 +853,15 @@ export function useUpdateMp3Track() {
       artist, 
       duration, 
       playlistId, 
-      visible,
-      order
+      visible, 
+      order 
     }: { 
       id: string; 
       title: string; 
       artist: string; 
       duration: bigint; 
       playlistId: string; 
-      visible: boolean;
+      visible: boolean; 
       order: bigint;
     }) => {
       if (!actor) throw new Error('Actor not available');
@@ -858,7 +869,6 @@ export function useUpdateMp3Track() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['mp3Tracks'] });
-      queryClient.invalidateQueries({ queryKey: ['mp3TracksByPlaylist'] });
     },
   });
 }
@@ -874,7 +884,6 @@ export function useDeleteMp3Track() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['mp3Tracks'] });
-      queryClient.invalidateQueries({ queryKey: ['mp3TracksByPlaylist'] });
     },
   });
 }
@@ -890,7 +899,6 @@ export function useReorderMp3Tracks() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['mp3Tracks'] });
-      queryClient.invalidateQueries({ queryKey: ['mp3TracksByPlaylist'] });
     },
   });
 }
@@ -906,7 +914,6 @@ export function useToggleMp3TrackVisibility() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['mp3Tracks'] });
-      queryClient.invalidateQueries({ queryKey: ['mp3TracksByPlaylist'] });
     },
   });
 }
@@ -969,7 +976,6 @@ export function useTogglePlaylistVisibility() {
   });
 }
 
-// MP3 Play Count Queries
 export function useIncrementPlayCount() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
@@ -981,7 +987,6 @@ export function useIncrementPlayCount() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['mp3Tracks'] });
-      queryClient.invalidateQueries({ queryKey: ['mp3TracksByPlaylist'] });
     },
   });
 }

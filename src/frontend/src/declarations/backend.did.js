@@ -252,6 +252,7 @@ export const idlService = IDL.Service({
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'bookAppointment' : IDL.Func([IDL.Text, IDL.Text], [IDL.Text], []),
   'cancelAppointment' : IDL.Func([IDL.Text], [], []),
+  'clearAnalyticsData' : IDL.Func([], [], []),
   'createBlogPost' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [IDL.Text], []),
   'createCheckoutSession' : IDL.Func(
       [IDL.Vec(ShoppingItem), IDL.Text, IDL.Text],
@@ -621,6 +622,7 @@ export const idlFactory = ({ IDL }) => {
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'bookAppointment' : IDL.Func([IDL.Text, IDL.Text], [IDL.Text], []),
     'cancelAppointment' : IDL.Func([IDL.Text], [], []),
+    'clearAnalyticsData' : IDL.Func([], [], []),
     'createBlogPost' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [IDL.Text], []),
     'createCheckoutSession' : IDL.Func(
         [IDL.Vec(ShoppingItem), IDL.Text, IDL.Text],

@@ -1,56 +1,49 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-05T02:23:31.391Z",
+  "generatedAt": "2026-02-18T16:15:10.644Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
+    "total": 3,
     "implemented": 3,
     "items": [
       {
-        "id": "REQ-4",
-        "summary": "Extend the backend analytics model to track a daily visitors time series and return it from the admin analytics API. Add a new field to AnalyticsData (e.g., dailyVisitors) that returns a list of (dayKey, count) buckets for the most recent days. The dayKey must be a stable calendar-day bucket derived from canister time (e.g., days-since-epoch as text, or a YYYY-MM-DD-like key), and tracking must exclude admin activity exactly like existing trackPageVisit/trackElementClick/trackSectionView do.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-5",
-        "summary": "Add a robust frontend tracking call so the backend daily visitors counter is incremented at most once per browser per calendar day. Store a local marker (e.g., localStorage) keyed by the computed local date (YYYY-MM-DD) and only trigger the daily-visitor tracking mutation when the stored date differs from today. Ensure this tracking runs on the public site (e.g., on homepage load) and continues to respect the existing visitor-only rule (admin activity must not be counted).",
+        "id": "REQ-1",
+        "summary": "Add a reload button to the AnalyticsManagement component that refetches all analytics data from the backend when clicked",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/utils/dailyVisitorTracking.ts",
-          "frontend/src/pages/HomePage.tsx"
+          "frontend/src/components/admin/AnalyticsManagement.tsx",
+          "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
-          "frontend/src/utils/dailyVisitorTracking.ts",
-          "frontend/src/pages/HomePage.tsx"
+          "frontend/src/components/admin/AnalyticsManagement.tsx",
+          "frontend/src/hooks/useQueries.ts"
         ]
       },
       {
-        "id": "REQ-6",
-        "summary": "Update the Admin Analytics dashboard UI (frontend/src/components/admin/AnalyticsManagement.tsx) to display a daily visitors bar chart for the last days using the new daily visitors series returned by the backend. The chart must render even when other analytics series are empty, and must show a clear empty state when no daily data exists yet.",
+        "id": "REQ-2",
+        "summary": "Add a reset button to the AnalyticsManagement component that clears all analytics data in the backend and refreshes the display",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/admin/AnalyticsManagement.tsx"
+          "frontend/src/components/admin/AnalyticsManagement.tsx",
+          "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
-          "frontend/src/components/admin/AnalyticsManagement.tsx"
+          "frontend/src/components/admin/AnalyticsManagement.tsx",
+          "frontend/src/hooks/useQueries.ts"
         ]
       },
       {
-        "id": "REQ-7",
-        "summary": "Update frontend query typing and data mapping so the new daily visitors field is fetched and consumed without TypeScript errors. This includes updating the AnalyticsData type usage in frontend/src/hooks/useQueries.ts (and any generated backend typings usage) and ensuring the admin analytics UI compiles and runs with the updated AnalyticsData shape.",
+        "id": "REQ-3",
+        "summary": "Review and simplify the AnalyticsManagement component code to improve reliability and maintainability",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts",
           "frontend/src/components/admin/AnalyticsManagement.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts",
           "frontend/src/components/admin/AnalyticsManagement.tsx"
         ]
       }
@@ -58,15 +51,7 @@
   },
   "changedFiles": [
     "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
-    "build-template/Dockerfile",
-    "build-template/LICENSE",
-    "build-template/README.md",
-    "build-template/deploy.sh",
-    "build-template/icp.yaml",
-    "build-template/src/backend/canister.yaml",
-    "build-template/src/frontend/canister.yaml",
     "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
@@ -74,12 +59,10 @@
     "frontend/src/backend.d.ts",
     "frontend/src/backend.ts",
     "frontend/src/components/admin/AnalyticsManagement.tsx",
+    "frontend/src/config.ts",
     "frontend/src/declarations/backend.did.d.ts",
     "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useInternetIdentity.ts",
     "frontend/src/hooks/useQueries.ts",
-    "frontend/src/pages/HomePage.tsx",
-    "frontend/src/utils/dailyVisitorTracking.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

@@ -214,6 +214,7 @@ export interface _SERVICE {
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'bookAppointment' : ActorMethod<[string, string], string>,
   'cancelAppointment' : ActorMethod<[string], undefined>,
+  'clearAnalyticsData' : ActorMethod<[], undefined>,
   'createBlogPost' : ActorMethod<[string, string, string], string>,
   'createCheckoutSession' : ActorMethod<
     [Array<ShoppingItem>, string, string],

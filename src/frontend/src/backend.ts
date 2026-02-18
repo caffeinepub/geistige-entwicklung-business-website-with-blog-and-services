@@ -315,6 +315,7 @@ export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     bookAppointment(customerName: string, timeSlotId: string): Promise<string>;
     cancelAppointment(appointmentId: string): Promise<void>;
+    clearAnalyticsData(): Promise<void>;
     createBlogPost(title: string, content: string, excerpt: string): Promise<string>;
     createCheckoutSession(items: Array<ShoppingItem>, successUrl: string, cancelUrl: string): Promise<string>;
     createPlaylist(name: string): Promise<string>;
@@ -612,6 +613,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.cancelAppointment(arg0);
+            return result;
+        }
+    }
+    async clearAnalyticsData(): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.clearAnalyticsData();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.clearAnalyticsData();
             return result;
         }
     }
